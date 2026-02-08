@@ -45,10 +45,10 @@ def main(
 # Sub-command groups (lazy imports keep startup fast)
 # ---------------------------------------------------------------------------
 
+from gh_agent_funhouse.agent.commands import agent_app  # noqa: E402
 from gh_agent_funhouse.auth.commands import auth_app  # noqa: E402
 from gh_agent_funhouse.mission.commands import mission_app  # noqa: E402
 from gh_agent_funhouse.repo.commands import repo_app  # noqa: E402
-agent_app = typer.Typer(name="agent", help="Coding-agent orchestration.", no_args_is_help=True)
 dashboard_app = typer.Typer(name="dashboard", help="TUI dashboard.", no_args_is_help=True)
 
 app.add_typer(auth_app)
