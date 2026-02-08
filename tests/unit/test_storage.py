@@ -29,9 +29,10 @@ def test_file_storage_delete_returns_false_when_no_token(tmp_path):
     assert storage.delete_token() is False
 
 
-def test_get_storage_returns_token_storage():
-    with patch.dict("sys.modules", {"keyring": MagicMock()}) as _:
-        import keyring as mock_kr
-        mock_kr.get_keyring.side_effect = RuntimeError("no keyring")
+def test_get_storage_returns_file_storage_when_keyring_unavailable():
+    mock_keyring = MagicMock()
+    mock_keyring.get_keyring.side_effect = RuntimeError("no keyring")
+    with patch.dict("sys.modules", {"keyring": mock_keyring, "keyring.backends.fail": MagicMock()}):
         result = get_storage()
+    assert isinstance(result, FileStorage)
     assert isinstance(result, TokenStorage)
