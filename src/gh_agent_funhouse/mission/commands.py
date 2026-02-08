@@ -6,6 +6,7 @@ Registered as the ``ghfun mission`` sub-command group.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TypedDict
 
 import typer
 from rich.console import Console
@@ -36,6 +37,13 @@ mission_app = typer.Typer(
 )
 
 # Label definitions for ghfun tasks
+class _TaskIssue(TypedDict):
+    spec: TaskSpec
+    number: int
+    url: str
+
+
+# Label definitions – colours chosen to match GitHub's default palette
 _GHFUN_LABELS: dict[str, dict[str, str]] = {
     "ghfun/mission": {"color": "6f42c1", "description": "gh-agent-funhouse mission tracking"},
     "ghfun/task": {"color": "0e8a16", "description": "gh-agent-funhouse task"},
@@ -232,7 +240,7 @@ def push() -> None:
 
             # Create issues for each task
             issue_task = progress.add_task("Creating task issues…", total=len(mission_spec.tasks))
-            task_issues: list[dict[str, object]] = []
+            task_issues: list[_TaskIssue] = []
             for task_spec in mission_spec.tasks:
                 type_label = f"ghfun/{task_spec.type}"
                 labels = ["ghfun/task", type_label]
@@ -250,7 +258,7 @@ def push() -> None:
                     owner, repo, task_spec.title, body=body, labels=labels,
                 )
                 issue_number: int = issue["number"]
-                task_issues.append({"spec": task_spec, "number": issue_number, "url": issue["html_url"]})
+                task_issues.append(_TaskIssue(spec=task_spec, number=issue_number, url=issue["html_url"]))
 
                 # Update or create DB task
                 db_task = (
@@ -277,7 +285,7 @@ def push() -> None:
             # Create tracking issue
             tracking_task = progress.add_task("Creating tracking issue…", total=None)
             checklist = "\n".join(
-                f"- [ ] #{ti['number']} — {ti['spec'].title}"  # type: ignore[index]
+                f"- [ ] #{ti['number']} — {ti['spec'].title}"
                 for ti in task_issues
             )
             tracking_body = (
@@ -311,7 +319,7 @@ def push() -> None:
         table.add_column("URL")
         for ti in task_issues:
             table.add_row(
-                str(ti["spec"].title),  # type: ignore[index]
+                str(ti["spec"].title),
                 f"#{ti['number']}",
                 str(ti["url"]),
             )
