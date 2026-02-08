@@ -1,0 +1,35 @@
+site_name: gh-agent-funhouse
+site_description: CLI/TUI tool for GitHub-based coding agent workflows
+site_url: https://mxn2020.github.io/ghuru/
+repo_url: https://github.com/mxn2020/ghuru
+repo_name: mxn2020/ghuru
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Authentication: auth.md
+      - Workflows: workflows.md
+  - Reference:
+      - Mission Format: mission-format.md
+      - Design: design.md
+  - Development:
+      - Setup: development.md
+      - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true

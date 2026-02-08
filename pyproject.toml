@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gh-agent-funhouse"
+version = "0.1.0"
+description = "CLI/TUI tool to launch, track, and manage GitHub-based coding agent workflows"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "gh-agent-funhouse contributors"},
+]
+keywords = ["github", "agents", "cli", "tui", "automation", "copilot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Build Tools",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0,<14.0",
+    "textual>=0.47.0,<1.0",
+    "httpx>=0.27.0,<1.0",
+    "sqlalchemy>=2.0,<3.0",
+    "pyyaml>=6.0,<7.0",
+    "keyring>=25.0,<26.0",
+    "cryptography>=42.0,<44.0",
+    "platformdirs>=4.0,<5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0,<10.0",
+    "pytest-cov>=7.0,<8.0",
+    "ruff>=0.8.0",
+    "mypy>=1.0",
+    "types-PyYAML>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0,<10.0",
+    "pytest-cov>=7.0,<8.0",
+    "ruff>=0.8.0",
+    "mypy>=1.0",
+    "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+ghfun = "gh_agent_funhouse.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/mxn2020/ghuru"
+Documentation = "https://mxn2020.github.io/ghuru/"
+Repository = "https://github.com/mxn2020/ghuru"
+Issues = "https://github.com/mxn2020/ghuru/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gh_agent_funhouse"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "TCH"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["keyring.*", "textual.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["gh_agent_funhouse"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
