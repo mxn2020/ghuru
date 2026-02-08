@@ -47,12 +47,12 @@ def main(
 
 from gh_agent_funhouse.agent.commands import agent_app  # noqa: E402
 from gh_agent_funhouse.auth.commands import auth_app  # noqa: E402
+from gh_agent_funhouse.dashboard.commands import dashboard_app_typer  # noqa: E402
 from gh_agent_funhouse.mission.commands import mission_app  # noqa: E402
 from gh_agent_funhouse.repo.commands import repo_app  # noqa: E402
-dashboard_app = typer.Typer(name="dashboard", help="TUI dashboard.", no_args_is_help=True)
 
 app.add_typer(auth_app)
 app.add_typer(repo_app)
 app.add_typer(mission_app)
 app.add_typer(agent_app)
-app.add_typer(dashboard_app)
+app.add_typer(dashboard_app_typer)
