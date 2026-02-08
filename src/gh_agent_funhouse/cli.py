@@ -45,7 +45,8 @@ def main(
 # Sub-command groups (lazy imports keep startup fast)
 # ---------------------------------------------------------------------------
 
-auth_app = typer.Typer(name="auth", help="Authenticate with GitHub.", no_args_is_help=True)
+from gh_agent_funhouse.auth.commands import auth_app  # noqa: E402
+
 repo_app = typer.Typer(name="repo", help="Repository management.", no_args_is_help=True)
 mission_app = typer.Typer(name="mission", help="Mission / issue workflows.", no_args_is_help=True)
 agent_app = typer.Typer(name="agent", help="Coding-agent orchestration.", no_args_is_help=True)
