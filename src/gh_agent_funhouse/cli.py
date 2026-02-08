@@ -46,8 +46,8 @@ def main(
 # ---------------------------------------------------------------------------
 
 from gh_agent_funhouse.auth.commands import auth_app  # noqa: E402
+from gh_agent_funhouse.mission.commands import mission_app  # noqa: E402
 from gh_agent_funhouse.repo.commands import repo_app  # noqa: E402
-mission_app = typer.Typer(name="mission", help="Mission / issue workflows.", no_args_is_help=True)
 agent_app = typer.Typer(name="agent", help="Coding-agent orchestration.", no_args_is_help=True)
 dashboard_app = typer.Typer(name="dashboard", help="TUI dashboard.", no_args_is_help=True)
 
