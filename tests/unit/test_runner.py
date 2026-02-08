@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Iterator
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
-from gh_agent_funhouse.agent.runner import RunRef, RunResult, RunStatus, Runner
+from gh_agent_funhouse.agent.runner import Runner, RunRef, RunResult, RunStatus
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 def test_run_status_values():
@@ -26,10 +29,13 @@ def test_run_ref_creation_with_defaults():
 
 
 def test_run_ref_creation_with_explicit_values():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     ref = RunRef(
-        run_id="r1", runner_type="copilot-cli", task_id="t-2",
-        github_run_id=42, started_at=now,
+        run_id="r1",
+        runner_type="copilot-cli",
+        task_id="t-2",
+        github_run_id=42,
+        started_at=now,
     )
     assert ref.github_run_id == 42
     assert ref.started_at == now

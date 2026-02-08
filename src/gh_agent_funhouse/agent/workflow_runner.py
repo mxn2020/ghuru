@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import time
 import uuid
-from datetime import datetime, timezone
-from typing import Iterator
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
-from gh_agent_funhouse.agent.runner import RunRef, RunResult, RunStatus, Runner
+from gh_agent_funhouse.agent.runner import Runner, RunRef, RunResult, RunStatus
 from gh_agent_funhouse.db import Run, Task, get_session, init_db
 from gh_agent_funhouse.github_client import GitHubClient, get_client
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 _WORKFLOW_FILE = "ghfun-agent.yml"
 _POLL_INTERVAL = 3.0
@@ -54,7 +57,7 @@ class GitHubWorkflowRunner(Runner):
         owner, repo_name = _parse_owner_repo(repo)
 
         # Record a timestamp *before* dispatching so we can find the new run.
-        before_dispatch = datetime.now(timezone.utc)
+        before_dispatch = datetime.now(UTC)
 
         self._client.dispatch_workflow(
             owner,
@@ -88,7 +91,7 @@ class GitHubWorkflowRunner(Runner):
             runner_type="workflow",
             task_id=task_id,
             github_run_id=github_run_id,
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
         )
 
         # Persist to DB
@@ -115,7 +118,9 @@ class GitHubWorkflowRunner(Runner):
         result = RunResult(
             status=status,
             log_url=data.get("html_url"),
-            ended_at=datetime.now(timezone.utc) if status not in (RunStatus.RUNNING, RunStatus.PENDING) else None,
+            ended_at=datetime.now(UTC)
+            if status not in (RunStatus.RUNNING, RunStatus.PENDING)
+            else None,
         )
 
         self._update_run(ref, result)
@@ -133,7 +138,7 @@ class GitHubWorkflowRunner(Runner):
         except RuntimeError:
             return False
 
-        self._update_run(ref, RunResult(status=RunStatus.CANCELLED, ended_at=datetime.now(timezone.utc)))
+        self._update_run(ref, RunResult(status=RunStatus.CANCELLED, ended_at=datetime.now(UTC)))
         return True
 
     def logs(self, ref: RunRef) -> Iterator[str]:
@@ -147,8 +152,7 @@ class GitHubWorkflowRunner(Runner):
                 f"/repos/{owner}/{repo_name}/actions/runs/{ref.github_run_id}/logs",
                 follow_redirects=True,
             )
-            for line in resp.text.splitlines():
-                yield line
+            yield from resp.text.splitlines()
         except RuntimeError as exc:
             yield f"Could not retrieve logs: {exc}"
 

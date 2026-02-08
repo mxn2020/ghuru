@@ -22,15 +22,14 @@ _DEFAULT_BACKOFF = 1.0  # seconds
 # Token helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_stored_token() -> str:
     """Retrieve the GitHub token from *keyring* auth storage."""
     import keyring  # lazy import to keep module lightweight
 
     token: str | None = keyring.get_password("gh-agent-funhouse", "github-token")
     if not token:
-        raise RuntimeError(
-            "No GitHub token found.  Run `ghfun auth login` to authenticate."
-        )
+        raise RuntimeError("No GitHub token found.  Run `ghfun auth login` to authenticate.")
     return token
 
 
@@ -80,22 +79,17 @@ class GitHubClient:
                 if attempt < _MAX_RETRIES:
                     time.sleep(wait)
                     continue
-                raise RuntimeError(
-                    "GitHub API rate limit exceeded.  "
-                    f"Resets at epoch {reset}."
-                )
+                raise RuntimeError(f"GitHub API rate limit exceeded.  Resets at epoch {reset}.")
 
             if response.status_code == 401:
                 raise RuntimeError(
-                    "GitHub authentication failed – check your token "
-                    "(run `ghfun auth login`)."
+                    "GitHub authentication failed – check your token (run `ghfun auth login`)."
                 )
 
             if response.status_code >= 400:
                 body = _redact_token(response.text, self._token)
                 raise RuntimeError(
-                    f"GitHub API error {response.status_code} "
-                    f"{method.upper()} {url}: {body}"
+                    f"GitHub API error {response.status_code} {method.upper()} {url}: {body}"
                 )
             return response
 
@@ -270,9 +264,7 @@ class GitHubClient:
             params={"per_page": per_page, "page": page},
         ).json()
 
-    def get_workflow_run(
-        self, owner: str, repo: str, run_id: int
-    ) -> dict[str, Any]:
+    def get_workflow_run(self, owner: str, repo: str, run_id: int) -> dict[str, Any]:
         """Get a single workflow run."""
         return self.get(  # type: ignore[no-any-return]
             f"/repos/{owner}/{repo}/actions/runs/{run_id}"

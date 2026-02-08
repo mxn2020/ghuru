@@ -5,11 +5,14 @@ from __future__ import annotations
 import shutil
 import subprocess
 import uuid
-from datetime import datetime, timezone
-from typing import Iterator
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
-from gh_agent_funhouse.agent.runner import RunRef, RunResult, RunStatus, Runner
+from gh_agent_funhouse.agent.runner import Runner, RunRef, RunResult, RunStatus
 from gh_agent_funhouse.db import Run, get_session, init_db
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 # In-process registry of active subprocesses keyed by run_id.
 _ACTIVE: dict[str, subprocess.Popen[str]] = {}
@@ -54,11 +57,7 @@ class CopilotCLIRunner(Runner):
     ) -> RunRef:
         gh = _ensure_copilot_available()
 
-        prompt = (
-            f"You are working on repository {repo}.\n"
-            f"Task type: {task_type}\n\n"
-            f"{instructions}"
-        )
+        prompt = f"You are working on repository {repo}.\nTask type: {task_type}\n\n{instructions}"
 
         proc = subprocess.Popen(
             [gh, "copilot", "suggest", "-t", "shell", prompt],
@@ -74,7 +73,7 @@ class CopilotCLIRunner(Runner):
             run_id=run_id,
             runner_type="copilot-cli",
             task_id=task_id,
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
         )
 
         self._save_run(ref)
@@ -89,7 +88,7 @@ class CopilotCLIRunner(Runner):
         if retcode is None:
             return RunResult(status=RunStatus.RUNNING)
 
-        ended = datetime.now(timezone.utc)
+        ended = datetime.now(UTC)
         status = RunStatus.SUCCESS if retcode == 0 else RunStatus.FAILED
         result = RunResult(status=status, ended_at=ended)
 
@@ -110,7 +109,7 @@ class CopilotCLIRunner(Runner):
 
         self._update_run(
             ref,
-            RunResult(status=RunStatus.CANCELLED, ended_at=datetime.now(timezone.utc)),
+            RunResult(status=RunStatus.CANCELLED, ended_at=datetime.now(UTC)),
         )
         return True
 

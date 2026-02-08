@@ -87,10 +87,12 @@ class TestRateLimitHandling:
             headers={"X-RateLimit-Reset": "0"},
         )
 
-        with patch.object(client._client, "request", return_value=mock_resp), \
-             patch("gh_agent_funhouse.github_client.time.sleep"):
-            with pytest.raises(RuntimeError, match="rate limit"):
-                client.get("/user")
+        with (
+            patch.object(client._client, "request", return_value=mock_resp),
+            patch("gh_agent_funhouse.github_client.time.sleep"),
+            pytest.raises(RuntimeError, match="rate limit"),
+        ):
+            client.get("/user")
 
 
 class TestTokenRedaction:
@@ -106,7 +108,8 @@ class TestTokenRedaction:
         client = GitHubClient(token=token)
 
         with patch.object(
-            client._client, "request",
+            client._client,
+            "request",
             side_effect=httpx.ConnectError(f"Failed to connect with {token}"),
         ):
             with pytest.raises(RuntimeError) as exc_info:

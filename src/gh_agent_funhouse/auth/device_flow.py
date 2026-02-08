@@ -41,9 +41,7 @@ def start_device_flow(client_id: str) -> dict[str, str | int]:
         )
 
     if resp.status_code != 200:
-        raise DeviceFlowError(
-            f"Failed to start device flow (HTTP {resp.status_code}): {resp.text}"
-        )
+        raise DeviceFlowError(f"Failed to start device flow (HTTP {resp.status_code}): {resp.text}")
 
     data: dict[str, str | int] = resp.json()
     required = {"device_code", "user_code", "verification_uri"}
@@ -102,16 +100,13 @@ def poll_for_token(client_id: str, device_code: str, interval: int = 5) -> str:
                 continue
 
             if error == "expired_token":
-                raise DeviceFlowError(
-                    "Device code expired.  Please restart the login flow."
-                )
+                raise DeviceFlowError("Device code expired.  Please restart the login flow.")
 
             if error == "access_denied":
                 raise DeviceFlowError("Authorization was denied by the user.")
 
             raise DeviceFlowError(
-                f"Unexpected device-flow error: {error} – "
-                f"{body.get('error_description', '')}"
+                f"Unexpected device-flow error: {error} – {body.get('error_description', '')}"
             )
 
 

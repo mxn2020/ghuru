@@ -8,12 +8,13 @@ Fernet-encrypted files).
 from __future__ import annotations
 
 import os
-from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from rich.console import Console
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from cryptography.fernet import Fernet
 
 from gh_agent_funhouse.config import get_config_dir

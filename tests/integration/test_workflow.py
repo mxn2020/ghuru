@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -50,7 +50,10 @@ def test_end_to_end_workflow(tmp_path):
 
     # Step 2: Simulate "push" — mock creating a GitHub issue
     mock_client = MagicMock()
-    mock_client.create_issue.return_value = {"number": 42, "html_url": "https://github.com/octocat/test-repo/issues/42"}
+    mock_client.create_issue.return_value = {
+        "number": 42,
+        "html_url": "https://github.com/octocat/test-repo/issues/42",
+    }
 
     with Session(engine) as session:
         m = session.get(Mission, mission_id)
@@ -72,8 +75,11 @@ def test_end_to_end_workflow(tmp_path):
     with Session(engine) as session:
         t = session.get(Task, task_id)
         mock_client.dispatch_workflow(
-            "octocat", "test-repo", "agent.yml",
-            ref="main", inputs={"task_id": str(t.id)},
+            "octocat",
+            "test-repo",
+            "agent.yml",
+            ref="main",
+            inputs={"task_id": str(t.id)},
         )
         run = Run(
             task_id=t.id,

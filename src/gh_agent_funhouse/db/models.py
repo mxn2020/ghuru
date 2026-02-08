@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -25,7 +24,7 @@ class AuthProfile(Base):
     username: Mapped[str] = mapped_column(String(255))
     auth_type: Mapped[str] = mapped_column(String(50))  # device_flow | pat
     created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
 
 
@@ -43,7 +42,7 @@ class RepoContext(Base):
     full_name: Mapped[str] = mapped_column(String(511))
     is_current: Mapped[bool] = mapped_column(default=False)
     selected_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
 
 
@@ -61,19 +60,21 @@ class Mission(Base):
     repo_full_name: Mapped[str] = mapped_column(String(511))
     local_path: Mapped[str] = mapped_column(String(1024))
     status: Mapped[str] = mapped_column(
-        String(50), default="draft",
+        String(50),
+        default="draft",
     )  # draft | pushed | active | completed
     created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
     updated_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
-    tracking_issue_number: Mapped[Optional[int]] = mapped_column(default=None)
+    tracking_issue_number: Mapped[int | None] = mapped_column(default=None)
 
     tasks: Mapped[list[Task]] = relationship(
-        back_populates="mission", cascade="all, delete-orphan",
+        back_populates="mission",
+        cascade="all, delete-orphan",
     )
 
 
@@ -94,20 +95,22 @@ class Task(Base):
     priority: Mapped[int] = mapped_column(default=3)
     instructions: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(
-        String(50), default="todo",
+        String(50),
+        default="todo",
     )  # todo | running | done | failed
-    github_issue_number: Mapped[Optional[int]] = mapped_column(default=None)
+    github_issue_number: Mapped[int | None] = mapped_column(default=None)
     created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
     updated_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
 
     mission: Mapped[Mission] = relationship(back_populates="tasks")
     runs: Mapped[list[Run]] = relationship(
-        back_populates="task", cascade="all, delete-orphan",
+        back_populates="task",
+        cascade="all, delete-orphan",
     )
 
 
@@ -125,12 +128,13 @@ class Run(Base):
         String(50),
     )  # workflow | copilot-cli
     status: Mapped[str] = mapped_column(
-        String(50), default="pending",
+        String(50),
+        default="pending",
     )  # pending | running | success | failed | cancelled
-    github_run_id: Mapped[Optional[int]] = mapped_column(default=None)
-    started_at: Mapped[Optional[datetime]] = mapped_column(default=None)
-    ended_at: Mapped[Optional[datetime]] = mapped_column(default=None)
-    log_url: Mapped[Optional[str]] = mapped_column(String(2048), default=None)
-    pr_url: Mapped[Optional[str]] = mapped_column(String(2048), default=None)
+    github_run_id: Mapped[int | None] = mapped_column(default=None)
+    started_at: Mapped[datetime | None] = mapped_column(default=None)
+    ended_at: Mapped[datetime | None] = mapped_column(default=None)
+    log_url: Mapped[str | None] = mapped_column(String(2048), default=None)
+    pr_url: Mapped[str | None] = mapped_column(String(2048), default=None)
 
     task: Mapped[Task] = relationship(back_populates="runs")

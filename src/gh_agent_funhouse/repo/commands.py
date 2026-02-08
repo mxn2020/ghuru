@@ -6,7 +6,6 @@ Registered as the ``ghfun repo`` sub-command group.
 from __future__ import annotations
 
 import base64
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -82,7 +81,7 @@ def create(
         "--private/--public",
         help="Repository visibility (default: public).",
     ),
-    description: Optional[str] = typer.Option(
+    description: str | None = typer.Option(
         None, "--description", "-d", help="Short repository description."
     ),
 ) -> None:
@@ -105,7 +104,7 @@ def create(
         table.add_row("Visibility", "private" if result.get("private") else "public")
         table.add_row("Description", result.get("description") or "—")
         table.add_row("URL", result.get("html_url", ""))
-        table.add_row("Context", f"[green]✓ selected as current repo[/green]")
+        table.add_row("Context", "[green]✓ selected as current repo[/green]")
         _console.print(table)
     except Exception as exc:  # noqa: BLE001
         _console.print(f"[red]✗ Failed to create repository:[/red] {exc}")
@@ -159,15 +158,11 @@ def list_repos(
 
 @repo_app.command()
 def select(
-    owner_repo: str = typer.Argument(
-        ..., help="Repository in OWNER/REPO format."
-    ),
+    owner_repo: str = typer.Argument(..., help="Repository in OWNER/REPO format."),
 ) -> None:
     """Select a repository as the current working context."""
     if "/" not in owner_repo:
-        _console.print(
-            f"[red]✗ Invalid format:[/red] expected OWNER/REPO, got {owner_repo!r}"
-        )
+        _console.print(f"[red]✗ Invalid format:[/red] expected OWNER/REPO, got {owner_repo!r}")
         raise typer.Exit(code=1)
 
     owner, repo = owner_repo.split("/", 1)
@@ -224,9 +219,7 @@ def bootstrap() -> None:
         default_branch: str = repo_info.get("default_branch", "main")
 
         # Get the SHA of the default branch HEAD
-        ref_data = client.get(
-            f"/repos/{owner}/{repo}/git/ref/heads/{default_branch}"
-        ).json()
+        ref_data = client.get(f"/repos/{owner}/{repo}/git/ref/heads/{default_branch}").json()
         head_sha: str = ref_data["object"]["sha"]
 
         # Create the bootstrap branch

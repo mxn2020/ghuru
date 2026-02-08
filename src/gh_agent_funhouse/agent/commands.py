@@ -14,7 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from gh_agent_funhouse.agent.copilot_runner import CopilotCLIRunner
-from gh_agent_funhouse.agent.runner import RunRef, RunStatus, Runner
+from gh_agent_funhouse.agent.runner import Runner, RunRef, RunStatus
 from gh_agent_funhouse.agent.workflow_runner import GitHubWorkflowRunner
 from gh_agent_funhouse.db import Run, Task, get_session, init_db
 
@@ -208,7 +208,9 @@ def watch(
     terminal_statuses = {RunStatus.SUCCESS, RunStatus.FAILED, RunStatus.CANCELLED}
 
     try:
-        with Live(_render(db_run.status, db_run.log_url), console=_console, refresh_per_second=1) as live:
+        with Live(
+            _render(db_run.status, db_run.log_url), console=_console, refresh_per_second=1
+        ) as live:
             while True:
                 result = backend.poll(ref)
                 live.update(_render(result.status.value, result.log_url))

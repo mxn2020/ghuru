@@ -6,7 +6,6 @@ Registered as the ``ghfun auth`` sub-command group.
 from __future__ import annotations
 
 import os
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -53,7 +52,7 @@ def _validate_token(token: str) -> dict:
 
 @auth_app.command()
 def login(
-    pat: Optional[str] = typer.Option(
+    pat: str | None = typer.Option(
         None,
         "--pat",
         help="Personal access token to store directly.",
@@ -63,7 +62,7 @@ def login(
         "--device-flow",
         help="Use GitHub Device Flow (OAuth) to authenticate.",
     ),
-    client_id: Optional[str] = typer.Option(
+    client_id: str | None = typer.Option(
         None,
         "--client-id",
         help="GitHub OAuth App client ID (required with --device-flow).",
@@ -79,9 +78,7 @@ def login(
     # --- Device flow ---
     elif device_flow:
         if not client_id:
-            _console.print(
-                "[red]✗ --client-id is required when using --device-flow.[/red]"
-            )
+            _console.print("[red]✗ --client-id is required when using --device-flow.[/red]")
             raise typer.Exit(code=1)
 
         from gh_agent_funhouse.auth.device_flow import DeviceFlowError, run_device_flow
@@ -133,7 +130,9 @@ def status() -> None:
     token = storage.load_token()
 
     if not token:
-        _console.print("[yellow]Not logged in.[/yellow] Run [bold]ghfun auth login[/bold] to authenticate.")
+        _console.print(
+            "[yellow]Not logged in.[/yellow] Run [bold]ghfun auth login[/bold] to authenticate."
+        )
         raise typer.Exit(code=1)
 
     # Determine token type heuristic
@@ -164,15 +163,19 @@ def status() -> None:
     # Current repo context
     repo = get_current_repo()
 
-    _console.print(Panel.fit(
-        "\n".join([
-            f"[bold]Token:[/bold]  {token_type} ({'valid' if username else '[red]invalid[/red]'})",
-            f"[bold]User:[/bold]   {username or '[red]unknown[/red]'}",
-            f"[bold]Repo:[/bold]   {repo or '[dim]not set[/dim]'}",
-        ]),
-        title="Auth Status",
-        border_style="bright_blue",
-    ))
+    _console.print(
+        Panel.fit(
+            "\n".join(
+                [
+                    f"[bold]Token:[/bold]  {token_type} ({'valid' if username else '[red]invalid[/red]'})",
+                    f"[bold]User:[/bold]   {username or '[red]unknown[/red]'}",
+                    f"[bold]Repo:[/bold]   {repo or '[dim]not set[/dim]'}",
+                ]
+            ),
+            title="Auth Status",
+            border_style="bright_blue",
+        )
+    )
 
 
 # ---------------------------------------------------------------------------

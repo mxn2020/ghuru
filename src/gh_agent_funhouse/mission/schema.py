@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
-from pathlib import Path
-from typing import Any
+from dataclasses import asdict, dataclass, field
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -127,8 +128,7 @@ def validate_mission(mission: MissionSpec) -> list[str]:
             errors.append(f"{prefix}: title is required.")
         if task.type not in VALID_TASK_TYPES:
             errors.append(
-                f"{prefix}: invalid type {task.type!r}; "
-                f"expected one of {sorted(VALID_TASK_TYPES)}."
+                f"{prefix}: invalid type {task.type!r}; expected one of {sorted(VALID_TASK_TYPES)}."
             )
         if not (1 <= task.priority <= 5):
             errors.append(f"{prefix}: priority must be 1-5, got {task.priority}.")

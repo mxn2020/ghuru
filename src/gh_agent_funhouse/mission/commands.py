@@ -36,6 +36,7 @@ mission_app = typer.Typer(
     no_args_is_help=True,
 )
 
+
 # Label definitions for ghfun tasks
 class _TaskIssue(TypedDict):
     spec: TaskSpec
@@ -255,10 +256,16 @@ def push() -> None:
                 )
 
                 issue = client.create_issue(
-                    owner, repo, task_spec.title, body=body, labels=labels,
+                    owner,
+                    repo,
+                    task_spec.title,
+                    body=body,
+                    labels=labels,
                 )
                 issue_number: int = issue["number"]
-                task_issues.append(_TaskIssue(spec=task_spec, number=issue_number, url=issue["html_url"]))
+                task_issues.append(
+                    _TaskIssue(spec=task_spec, number=issue_number, url=issue["html_url"])
+                )
 
                 # Update or create DB task
                 db_task = (
@@ -285,8 +292,7 @@ def push() -> None:
             # Create tracking issue
             tracking_task = progress.add_task("Creating tracking issue…", total=None)
             checklist = "\n".join(
-                f"- [ ] #{ti['number']} — {ti['spec'].title}"
-                for ti in task_issues
+                f"- [ ] #{ti['number']} — {ti['spec'].title}" for ti in task_issues
             )
             tracking_body = (
                 f"# 🎯 Mission: {mission_spec.title}\n\n"
@@ -387,10 +393,14 @@ def status() -> None:
                     for db_task in db_mission.tasks:
                         if db_task.github_issue_number:
                             issue = client.get_issue(owner, repo, db_task.github_issue_number)
-                            github_states[db_task.github_issue_number] = issue.get("state", "unknown")
+                            github_states[db_task.github_issue_number] = issue.get(
+                                "state", "unknown"
+                            )
                     if db_mission.tracking_issue_number:
                         tracking = client.get_issue(owner, repo, db_mission.tracking_issue_number)
-                        github_states[db_mission.tracking_issue_number] = tracking.get("state", "unknown")
+                        github_states[db_mission.tracking_issue_number] = tracking.get(
+                            "state", "unknown"
+                        )
                 finally:
                     client.close()
             except Exception:  # noqa: BLE001
@@ -404,7 +414,11 @@ def status() -> None:
                 f"Status: [bold]{db_mission.status}[/bold]  |  "
                 f"Repo: {db_mission.repo_full_name}  |  "
                 f"Tracking: "
-                + (f"#{db_mission.tracking_issue_number}" if db_mission.tracking_issue_number else "—"),
+                + (
+                    f"#{db_mission.tracking_issue_number}"
+                    if db_mission.tracking_issue_number
+                    else "—"
+                ),
                 title="Mission",
                 border_style="bright_blue",
             )
@@ -459,9 +473,7 @@ def status() -> None:
             bar_len = 20
             filled = int(bar_len * done_count / total)
             bar = "█" * filled + "░" * (bar_len - filled)
-            _console.print(
-                f"\n  Progress: [{bar}] {done_count}/{total} ({pct}%)\n"
-            )
+            _console.print(f"\n  Progress: [{bar}] {done_count}/{total} ({pct}%)\n")
 
     finally:
         session.close()

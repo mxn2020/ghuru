@@ -6,7 +6,7 @@ task status, recent runs, and a timeline feed.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from textual import work
@@ -137,14 +137,12 @@ def _load_dashboard_data() -> dict[str, Any]:
                 }
             )
         for r in runs:
-            ts = r.ended_at or r.started_at or datetime.now(timezone.utc)
+            ts = r.ended_at or r.started_at or datetime.now(UTC)
             timeline.append(
                 {
                     "time": ts,
                     "icon": _RUN_STATUS_BADGE.get(r.status, ""),
-                    "text": (
-                        f"Run #{r.id} ({r.runner_type}) → {r.status}"
-                    ),
+                    "text": (f"Run #{r.id} ({r.runner_type}) → {r.status}"),
                 }
             )
         timeline.sort(key=lambda e: e["time"], reverse=True)
@@ -179,11 +177,11 @@ class MissionPanel(Static):
     }
     """
 
-    def update_mission(
-        self, mission: dict[str, Any] | None, tasks: list[dict[str, Any]]
-    ) -> None:
+    def update_mission(self, mission: dict[str, Any] | None, tasks: list[dict[str, Any]]) -> None:
         if not mission:
-            self.update("🎪 [dim]No active mission - create one with [bold]ghfun mission init[/bold][/dim]")
+            self.update(
+                "🎪 [dim]No active mission - create one with [bold]ghfun mission init[/bold][/dim]"
+            )
             return
 
         emoji = _MISSION_STATUS_EMOJI.get(mission["status"], "")
@@ -254,9 +252,7 @@ class RunsPanel(Static):
             started = ""
             if r.get("started"):
                 started = f" {r['started']:%H:%M:%S}"
-            lines.append(
-                f"  {badge}  Run #{r['id']} [{r['runner']}]{started}{link}"
-            )
+            lines.append(f"  {badge}  Run #{r['id']} [{r['runner']}]{started}{link}")
         self.update("\n".join(lines))
 
 

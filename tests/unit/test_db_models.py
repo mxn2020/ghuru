@@ -66,10 +66,16 @@ def test_create_run(tmp_path):
     engine = _make_engine(tmp_path)
     with Session(engine) as session:
         mission = Mission(
-            title="M", summary="S", repo_full_name="o/r", local_path="/tmp/m",
+            title="M",
+            summary="S",
+            repo_full_name="o/r",
+            local_path="/tmp/m",
         )
         task = Task(
-            title="T", task_type="code", priority=1, instructions="I",
+            title="T",
+            task_type="code",
+            priority=1,
+            instructions="I",
         )
         mission.tasks.append(task)
         session.add(mission)
@@ -107,12 +113,18 @@ def test_crud_mission_and_tasks(tmp_path):
         session.flush()
 
         t1 = Task(
-            mission_id=mission.id, title="Task A", task_type="docs",
-            priority=1, instructions="Write docs",
+            mission_id=mission.id,
+            title="Task A",
+            task_type="docs",
+            priority=1,
+            instructions="Write docs",
         )
         t2 = Task(
-            mission_id=mission.id, title="Task B", task_type="tests",
-            priority=2, instructions="Write tests",
+            mission_id=mission.id,
+            title="Task B",
+            task_type="tests",
+            priority=2,
+            instructions="Write tests",
         )
         session.add_all([t1, t2])
         session.commit()
