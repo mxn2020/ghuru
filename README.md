@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mxn2020/ghuru/actions/workflows/ci.yml/badge.svg)](https://github.com/mxn2020/ghuru/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-yellow.svg)](LICENSE)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 **CLI/TUI tool to launch, track, and manage GitHub-based coding agent workflows.**
@@ -239,3 +239,6 @@ uv run mypy src/
 
 [MIT](LICENSE)
 
+---
+
+> **License note:** As of 2026-10-23 this project is licensed under the Apache License 2.0 (previously MIT). Versions released before this change remain available under MIT to those who received them.
